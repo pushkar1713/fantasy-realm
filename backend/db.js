@@ -1,16 +1,16 @@
 import mongoose from "mongoose";
 
-try {
-  async function main() {
+export const main = async () => {
+  try {
     await mongoose.connect(
       "mongodb+srv://pushkar1713:cUHs92AswtTclzXK@cluster0.w6lkxlt.mongodb.net/pdt"
     );
-    console.log("database connected successfully");
+    console.log("Database connected successfully");
+  } catch (error) {
+    console.log("Database connection failed", error);
+    process.exit(1); // Exit the process with failure if connection fails
   }
-} catch (e) {
-  console.log(e);
-  console.log("error occured");
-}
+};
 
 const PlayerSchema = new mongoose.Schema({
   name: {
@@ -61,9 +61,17 @@ const userSchema = new mongoose.Schema({
 });
 
 const teamSchema = new mongoose.Schema({
+  teamName: {
+    type: String,
+    required: true,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
+  players: [PlayerSchema],
 });
+
+export const User = mongoose.model("User", userSchema);
+export const Team = mongoose.model("Team", teamSchema);
