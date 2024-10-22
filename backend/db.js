@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Decimal128 } from "mongodb";
 
 export const main = async () => {
   try {
@@ -15,15 +16,14 @@ export const main = async () => {
 const PlayerSchema = new mongoose.Schema({
   name: {
     type: String,
-    unique: true,
     required: true,
   },
   battingAverage: {
-    type: Number,
+    type: Decimal128,
     required: true,
   },
   bowlingAverage: {
-    type: Number,
+    type: Decimal128,
     required: true,
   },
   wickets: {
@@ -75,3 +75,4 @@ const teamSchema = new mongoose.Schema({
 
 export const User = mongoose.model("User", userSchema);
 export const Team = mongoose.model("Team", teamSchema);
+export const Players = mongoose.model("Players", PlayerSchema);

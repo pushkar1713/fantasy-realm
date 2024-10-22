@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, LogOut, User } from "lucide-react";
@@ -22,104 +23,37 @@ interface Player {
   wickets: number;
 }
 
-const availablePlayers: Player[] = [
-  {
-    id: 1,
-    name: "Virat Kohli",
-    battingAverage: 53.5,
-    bowlingAverage: 0,
-    runs: 12169,
-    wickets: 4,
-  },
-  {
-    id: 2,
-    name: "Jasprit Bumrah",
-    battingAverage: 3.5,
-    bowlingAverage: 21.9,
-    runs: 42,
-    wickets: 128,
-  },
-  {
-    id: 3,
-    name: "Rohit Sharma",
-    battingAverage: 48.6,
-    bowlingAverage: 0,
-    runs: 9283,
-    wickets: 8,
-  },
-  {
-    id: 4,
-    name: "Ravindra Jadeja",
-    battingAverage: 36.2,
-    bowlingAverage: 24.3,
-    runs: 2523,
-    wickets: 242,
-  },
-  {
-    id: 5,
-    name: "KL Rahul",
-    battingAverage: 45.1,
-    bowlingAverage: 0,
-    runs: 1831,
-    wickets: 0,
-  },
-  {
-    id: 6,
-    name: "Hardik Pandya",
-    battingAverage: 29.9,
-    bowlingAverage: 41.3,
-    runs: 1386,
-    wickets: 54,
-  },
-  {
-    id: 7,
-    name: "Rishabh Pant",
-    battingAverage: 43.3,
-    bowlingAverage: 0,
-    runs: 1920,
-    wickets: 0,
-  },
-  {
-    id: 8,
-    name: "Ravichandran Ashwin",
-    battingAverage: 27.7,
-    bowlingAverage: 24.3,
-    runs: 2685,
-    wickets: 442,
-  },
-  {
-    id: 9,
-    name: "Shikhar Dhawan",
-    battingAverage: 45.1,
-    bowlingAverage: 0,
-    runs: 6105,
-    wickets: 0,
-  },
-  {
-    id: 10,
-    name: "Mohammed Shami",
-    battingAverage: 11.6,
-    bowlingAverage: 27.6,
-    runs: 523,
-    wickets: 216,
-  },
-  {
-    id: 11,
-    name: "Cheteshwar Pujara",
-    battingAverage: 43.9,
-    bowlingAverage: 0,
-    runs: 6792,
-    wickets: 0,
-  },
-];
-
 export default function CreateTeamPage() {
+  const [player, setPlayer] = useState<Player[]>([]);
+  useEffect(() => {
+    const getPlayers = async () => {
+      console.log("About to fetch players...");
+      try {
+        const response = await axios.get("http://localhost:3000/");
+
+        // Transform the data to extract the decimal values
+        const transformedPlayers = response.data.map((player: any) => ({
+          id: player._id, // Use _id as the unique identifier
+          name: player.name,
+          battingAverage: parseFloat(player.battingAverage.$numberDecimal),
+          bowlingAverage: parseFloat(player.bowlingAverage.$numberDecimal),
+          runs: player.runs,
+          wickets: player.wickets,
+        }));
+
+        setPlayer(transformedPlayers);
+      } catch (error) {
+        console.error("Error fetching players:", error);
+      }
+    };
+    getPlayers();
+  }, []);
   const [teamName, setTeamName] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
 
   const handleAddPlayer = (player: Player) => {
     if (
-      selectedPlayers.length < 10 &&
+      selectedPlayers.length < 11 &&
       !selectedPlayers.some((p) => p.id === player.id)
     ) {
       setSelectedPlayers([...selectedPlayers, player]);
@@ -170,7 +104,7 @@ export default function CreateTeamPage() {
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-2">
-              Selected Players ({selectedPlayers.length}/10)
+              Selected Players ({selectedPlayers.length}/11)
             </h2>
             <Table>
               <TableHeader>
@@ -211,7 +145,7 @@ export default function CreateTeamPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {availablePlayers.map((player) => (
+                {player.map((player) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
                     <TableCell>{player.battingAverage.toFixed(2)}</TableCell>
@@ -228,7 +162,7 @@ export default function CreateTeamPage() {
                         size="sm"
                         onClick={() => handleAddPlayer(player)}
                         disabled={
-                          selectedPlayers.length >= 10 ||
+                          selectedPlayers.length >= 11 ||
                           selectedPlayers.some((p) => p.id === player.id)
                         }
                       >

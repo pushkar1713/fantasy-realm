@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import { Shield, LogOut, UserPlus, User } from "lucide-react";
 import {
   Table,
@@ -24,55 +25,27 @@ export default function DashboardPage() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    // Simulating data fetching from backend
-    const fetchPlayers = async () => {
-      // In a real application, this would be an API call
-      const mockData: Player[] = [
-        {
-          id: 1,
-          name: "Virat Kohli",
-          battingAverage: 53.5,
-          bowlingAverage: 0,
-          runs: 12169,
-          wickets: 4,
-        },
-        {
-          id: 2,
-          name: "Jasprit Bumrah",
-          battingAverage: 3.5,
-          bowlingAverage: 21.9,
-          runs: 42,
-          wickets: 128,
-        },
-        {
-          id: 3,
-          name: "Rohit Sharma",
-          battingAverage: 48.6,
-          bowlingAverage: 0,
-          runs: 9283,
-          wickets: 8,
-        },
-        {
-          id: 4,
-          name: "Ravindra Jadeja",
-          battingAverage: 36.2,
-          bowlingAverage: 24.3,
-          runs: 2523,
-          wickets: 242,
-        },
-        {
-          id: 5,
-          name: "KL Rahul",
-          battingAverage: 45.1,
-          bowlingAverage: 0,
-          runs: 1831,
-          wickets: 0,
-        },
-      ];
-      setPlayers(mockData);
-    };
+    const getPlayers = async () => {
+      console.log("About to fetch players...");
+      try {
+        const response = await axios.get("http://localhost:3000/");
 
-    fetchPlayers();
+        // Transform the data to extract the decimal values
+        const transformedPlayers = response.data.map((player: any) => ({
+          id: player._id, // Use _id as the unique identifier
+          name: player.name,
+          battingAverage: parseFloat(player.battingAverage.$numberDecimal),
+          bowlingAverage: parseFloat(player.bowlingAverage.$numberDecimal),
+          runs: player.runs,
+          wickets: player.wickets,
+        }));
+
+        setPlayers(transformedPlayers);
+      } catch (error) {
+        console.error("Error fetching players:", error);
+      }
+    };
+    getPlayers();
   }, []);
 
   return (
