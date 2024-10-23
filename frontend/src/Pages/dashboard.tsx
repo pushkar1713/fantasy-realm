@@ -28,7 +28,7 @@ export default function DashboardPage() {
     const getPlayers = async () => {
       console.log("About to fetch players...");
       try {
-        const response = await axios.get("http://localhost:3000/");
+        const response = await axios.get("http://localhost:3000/players");
 
         // Transform the data to extract the decimal values
         const transformedPlayers = response.data.map((player: any) => ({

@@ -5,6 +5,7 @@ import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, LogOut, User } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -29,7 +30,7 @@ export default function CreateTeamPage() {
     const getPlayers = async () => {
       console.log("About to fetch players...");
       try {
-        const response = await axios.get("http://localhost:3000/");
+        const response = await axios.get("http://localhost:3000/players");
 
         // Transform the data to extract the decimal values
         const transformedPlayers = response.data.map((player: any) => ({
@@ -50,6 +51,8 @@ export default function CreateTeamPage() {
   }, []);
   const [teamName, setTeamName] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  console.log(selectedPlayers);
+  const userId = localStorage.getItem("userId");
 
   const handleAddPlayer = (player: Player) => {
     if (
@@ -63,14 +66,27 @@ export default function CreateTeamPage() {
   const handleRemovePlayer = (playerId: number) => {
     setSelectedPlayers(selectedPlayers.filter((p) => p.id !== playerId));
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  console.log({
+    teamName: teamName,
+    players: selectedPlayers,
+    user_id: userId,
+  });
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the team data to your backend
-    console.log("Team created:", { name: teamName, players: selectedPlayers });
-    // Reset form or redirect user
-  };
+    try {
+      const response = await axios.post("http://localhost:3000/teams", {
+        teamName: teamName,
+        players: selectedPlayers,
+        user_id: userId,
+      });
 
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      console.log("team created successfully");
+    } catch (error) {
+      console.error("Error signing up:", error);
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-r from-primary/10 via-primary/5 to-background">
       <header className="container mx-auto max-w-6xl px-4 lg:px-6 h-14 flex items-center justify-between border-b">
@@ -176,7 +192,8 @@ export default function CreateTeamPage() {
           </div>
           <Button
             type="submit"
-            disabled={selectedPlayers.length === 0 || teamName.trim() === ""}
+            disabled={selectedPlayers.length < 11 || teamName.trim() === ""}
+            onClick={handleSubmit}
           >
             Create Team
           </Button>

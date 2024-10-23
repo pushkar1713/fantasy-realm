@@ -3,8 +3,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+type userInfo = {
+  email: string;
+  password: string;
+};
+
+const defaultValue: userInfo = {
+  email: "",
+  password: "",
+};
 
 export default function SignInPage() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<userInfo>(defaultValue);
+  console.log(user);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/user/signin",
+        user
+      );
+
+      const token = response.data.token;
+      const userId = response.data.userId;
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+      console.log("User signed in successfully");
+      navigate("/home");
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-r from-primary/10 via-primary/5 to-background">
       <header className="container mx-auto max-w-6xl px-4 lg:px-6 h-14 flex items-center justify-between border-b">
@@ -34,6 +68,9 @@ export default function SignInPage() {
                 type="email"
                 placeholder="Enter your email"
                 required
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setUser({ ...user, email: e.target.value });
+                }}
               />
             </div>
             <div className="space-y-1">
@@ -43,9 +80,12 @@ export default function SignInPage() {
                 type="password"
                 placeholder="Enter your password"
                 required
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setUser({ ...user, password: e.target.value });
+                }}
               />
             </div>
-            <Button className="w-full" type="submit">
+            <Button className="w-full" type="submit" onClick={handleSubmit}>
               Sign In
             </Button>
           </form>

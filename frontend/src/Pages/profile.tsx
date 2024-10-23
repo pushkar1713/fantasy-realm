@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-// import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, ChevronRight } from "lucide-react";
 import {
@@ -18,17 +17,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import axios from "axios";
+
+interface Decimal128 {
+  $numberDecimal: string; // Representing the decimal number as a string
+}
 
 interface Team {
-  id: number;
-  name: string;
+  _id: string; // Change to string for MongoDB ObjectId
+  teamName: string;
 }
 
 interface Player {
-  id: number;
+  id: string; // Change to string to match MongoDB ObjectId format
   name: string;
-  battingAverage: number;
-  bowlingAverage: number;
+  battingAverage: Decimal128;
+  bowlingAverage: Decimal128;
   runs: number;
   wickets: number;
 }
@@ -47,75 +51,67 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<TeamDetails | null>(null);
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    // Simulating user data fetch
-    setUser({
-      username: "cricket_fan_2024",
-      email: "fan@example.com",
-      imageUrl: "https://i.pravatar.cc/150?img=68",
-    });
+    const fetchProfileData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/userDetails?userId=${userId}`
+        );
 
-    // Simulating teams data fetch
-    setTeams([
-      { id: 1, name: "Dream Team XI" },
-      { id: 2, name: "Super Strikers" },
-      { id: 3, name: "Royal Challengers" },
-    ]);
-  }, []);
-
-  const fetchTeamDetails = async (teamId: number) => {
-    // Simulating API call to fetch team details
-    const mockPlayers: Player[] = [
-      {
-        id: 1,
-        name: "Virat Kohli",
-        battingAverage: 53.5,
-        bowlingAverage: 0,
-        runs: 12169,
-        wickets: 4,
-      },
-      {
-        id: 2,
-        name: "Jasprit Bumrah",
-        battingAverage: 3.5,
-        bowlingAverage: 21.9,
-        runs: 42,
-        wickets: 128,
-      },
-      {
-        id: 3,
-        name: "Rohit Sharma",
-        battingAverage: 48.6,
-        bowlingAverage: 0,
-        runs: 9283,
-        wickets: 8,
-      },
-      {
-        id: 4,
-        name: "Ravindra Jadeja",
-        battingAverage: 36.2,
-        bowlingAverage: 24.3,
-        runs: 2523,
-        wickets: 242,
-      },
-      {
-        id: 5,
-        name: "KL Rahul",
-        battingAverage: 45.1,
-        bowlingAverage: 0,
-        runs: 1831,
-        wickets: 0,
-      },
-    ];
-
-    const teamDetails: TeamDetails = {
-      id: teamId,
-      name: teams.find((team) => team.id === teamId)?.name || "Unknown Team",
-      players: mockPlayers,
+        setUser({
+          username: response.data.username,
+          email: response.data.email,
+          imageUrl:
+            "https://thumbs.dreamstime.com/b/vector-engraved-style-illustration-posters-decoration-p-vector-engraved-style-illustration-posters-decoration-129936369.jpg",
+        });
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     };
 
-    setSelectedTeam(teamDetails);
+    const fetchTeamData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/teams?userId=${userId}`
+        );
+
+        setTeams(response.data);
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
+
+    if (userId) {
+      fetchProfileData();
+      fetchTeamData();
+    }
+  }, [userId]);
+
+  const fetchTeamDetails = async (teamId: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/teams/${teamId}`);
+
+      const players = response.data.players || [];
+
+      const playersWithNumericAverages = players.map((player: Player) => ({
+        ...player,
+        battingAverage: Number(player.battingAverage?.$numberDecimal || 0),
+        bowlingAverage: Number(player.bowlingAverage?.$numberDecimal || 0),
+      }));
+
+      const teamDetails: TeamDetails = {
+        _id: teamId,
+        teamName: response.data.teamName, // Assuming response.data contains teamName
+        players: playersWithNumericAverages,
+      };
+
+      console.log(response.data.players);
+      setSelectedTeam(teamDetails);
+    } catch (error) {
+      console.error("Error fetching team details:", error);
+    }
   };
 
   if (!user) {
@@ -142,9 +138,7 @@ export default function ProfilePage() {
             <img
               src={user.imageUrl}
               alt={user.username}
-              width={100}
-              height={100}
-              className="rounded-full"
+              className="rounded-full w-24 h-24" // Fixed width and height
             />
             <div>
               <h1 className="text-2xl font-bold">{user.username}</h1>
@@ -163,22 +157,22 @@ export default function ProfilePage() {
           </TableHeader>
           <TableBody>
             {teams.map((team) => (
-              <TableRow key={team.id}>
-                <TableCell>{team.name}</TableCell>
+              <TableRow key={team._id}>
+                <TableCell>{team.teamName}</TableCell>
                 <TableCell className="text-right">
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => fetchTeamDetails(team.id)}
+                        onClick={() => fetchTeamDetails(team._id)}
                       >
                         View <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl">
                       <DialogHeader>
-                        <DialogTitle>{selectedTeam?.name}</DialogTitle>
+                        <DialogTitle>{selectedTeam?.teamName}</DialogTitle>
                       </DialogHeader>
                       <Table>
                         <TableHeader>
@@ -195,11 +189,14 @@ export default function ProfilePage() {
                             <TableRow key={player.id}>
                               <TableCell>{player.name}</TableCell>
                               <TableCell>
-                                {player.battingAverage.toFixed(2)}
+                                {typeof player.battingAverage === "number"
+                                  ? player.battingAverage
+                                  : "N/A"}
                               </TableCell>
                               <TableCell>
-                                {player.bowlingAverage > 0
-                                  ? player.bowlingAverage.toFixed(2)
+                                {typeof player.bowlingAverage === "number" &&
+                                player.bowlingAverage > 0
+                                  ? player.bowlingAverage
                                   : "N/A"}
                               </TableCell>
                               <TableCell>{player.runs}</TableCell>
