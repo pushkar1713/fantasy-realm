@@ -53,19 +53,23 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-r from-primary/10 via-primary/5 to-background">
       <header className="container mx-auto max-w-6xl px-4 lg:px-6 h-14 flex items-center justify-between border-b">
-        <Link className="flex items-center justify-center" to="/">
+        <Link className="flex items-center justify-center" to={"/"}>
           <Shield className="h-6 w-6 text-primary" />
           <span className="ml-2 text-2xl font-bold">FantasyRealm</span>
         </Link>
         <nav className="flex items-center gap-4">
-          <Button variant="outline">
-            <UserPlus className="h-4 w-4 mr-2" />
-            Create Team
-          </Button>
-          <Button variant="outline">
-            <User className="h-4 w-4 mr-2" />
-            Profile
-          </Button>
+          <Link to={"/createTeam"}>
+            <Button variant="outline">
+              <UserPlus className="h-4 w-4 mr-2" />
+              Create Team
+            </Button>
+          </Link>
+          <Link to={"/profile"}>
+            <Button variant="outline">
+              <User className="h-4 w-4 mr-2" />
+              Profile
+            </Button>
+          </Link>
           <Button variant="outline">
             <LogOut className="h-4 w-4 mr-2" />
             Logout

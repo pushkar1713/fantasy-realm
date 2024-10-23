@@ -5,6 +5,7 @@ import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Table,
@@ -25,6 +26,7 @@ interface Player {
 }
 
 export default function CreateTeamPage() {
+  const navigate = useNavigate();
   const [player, setPlayer] = useState<Player[]>([]);
   useEffect(() => {
     const getPlayers = async () => {
@@ -88,6 +90,7 @@ export default function CreateTeamPage() {
       const token = response.data.token;
       localStorage.setItem("token", token);
       console.log("team created successfully");
+      navigate("/profile");
     } catch (error) {
       console.error("Error signing up:", error);
     }
