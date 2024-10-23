@@ -28,7 +28,7 @@ export default function SignupPage() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://fantasy-realm-backend.onrender.com/signup",
+        "https://fantasy-realm-backend.onrender.com/user/signup",
         user
       );
 

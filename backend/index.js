@@ -4,7 +4,6 @@ import cors from "cors";
 import { User, Team, Players } from "./db.js";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
-import errorMap from "zod/locales/en.js";
 
 const app = express();
 app.use(express.json());
