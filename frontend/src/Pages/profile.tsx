@@ -57,7 +57,7 @@ export default function ProfilePage() {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/userDetails?userId=${userId}`
+          `https://fantasy-realm-backend.onrender.com/userDetails?userId=${userId}`
         );
 
         setUser({
@@ -74,7 +74,7 @@ export default function ProfilePage() {
     const fetchTeamData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/teams?userId=${userId}`
+          `https://fantasy-realm-backend.onrender.com/teams?userId=${userId}`
         );
 
         setTeams(response.data);
@@ -91,7 +91,9 @@ export default function ProfilePage() {
 
   const fetchTeamDetails = async (teamId: string) => {
     try {
-      const response = await axios.get(`http://localhost:3000/teams/${teamId}`);
+      const response = await axios.get(
+        `https://fantasy-realm-backend.onrender.com/teams/${teamId}`
+      );
 
       const players = response.data.players || [];
 

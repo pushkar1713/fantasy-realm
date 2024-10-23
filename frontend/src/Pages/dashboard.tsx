@@ -28,7 +28,9 @@ export default function DashboardPage() {
     const getPlayers = async () => {
       console.log("About to fetch players...");
       try {
-        const response = await axios.get("http://localhost:3000/players");
+        const response = await axios.get(
+          "https://fantasy-realm-backend.onrender.com/players"
+        );
 
         // Transform the data to extract the decimal values
         const transformedPlayers = response.data.map((player: any) => ({

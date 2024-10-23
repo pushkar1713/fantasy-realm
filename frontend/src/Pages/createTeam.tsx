@@ -30,7 +30,9 @@ export default function CreateTeamPage() {
     const getPlayers = async () => {
       console.log("About to fetch players...");
       try {
-        const response = await axios.get("http://localhost:3000/players");
+        const response = await axios.get(
+          "https://fantasy-realm-backend.onrender.com/players"
+        );
 
         // Transform the data to extract the decimal values
         const transformedPlayers = response.data.map((player: any) => ({
@@ -74,11 +76,14 @@ export default function CreateTeamPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/teams", {
-        teamName: teamName,
-        players: selectedPlayers,
-        user_id: userId,
-      });
+      const response = await axios.post(
+        "https://fantasy-realm-backend.onrender.com/teams",
+        {
+          teamName: teamName,
+          players: selectedPlayers,
+          user_id: userId,
+        }
+      );
 
       const token = response.data.token;
       localStorage.setItem("token", token);
