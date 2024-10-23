@@ -12,7 +12,7 @@ export default function LandingPage() {
         </Link>
         <nav className="flex items-center gap-4">
           <Button asChild>
-            <Link to="#">Login</Link>
+            <Link to={"/signin"}>Login</Link>
           </Button>
           <Link to="#" className="text-sm font-medium hover:text-primary">
             <Github className="h-5 w-5" />
@@ -94,9 +94,11 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
-                <Button className="w-full" type="submit">
-                  Sign Up
-                </Button>
+                <Link to={"/signup"}>
+                  <Button className="w-full" type="submit">
+                    Sign Up
+                  </Button>
+                </Link>
                 <p className="text-xs text-muted-foreground">
                   By signing up, you agree to our{" "}
                   <Link className="underline underline-offset-2" to="#">

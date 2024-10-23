@@ -46,13 +46,13 @@ export default function SignupPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-r from-primary/10 via-primary/5 to-background">
       <header className="container mx-auto max-w-6xl px-4 lg:px-6 h-14 flex items-center justify-between border-b">
-        <Link className="flex items-center justify-center" to="/">
+        <Link className="flex items-center justify-center" to={"/"}>
           <Shield className="h-6 w-6 text-primary" />
           <span className="ml-2 text-2xl font-bold">FantasyRealm</span>
         </Link>
         <nav className="flex items-center gap-4">
           <Button asChild variant="outline">
-            <Link to="/">Back to Landing Page</Link>
+            <Link to={"/"}>Back to Landing Page</Link>
           </Button>
         </nav>
       </header>
@@ -106,7 +106,10 @@ export default function SignupPage() {
           </form>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link className="font-medium text-primary hover:underline" to="#">
+            <Link
+              className="font-medium text-primary hover:underline"
+              to={"/signin"}
+            >
               Log in
             </Link>
           </p>
